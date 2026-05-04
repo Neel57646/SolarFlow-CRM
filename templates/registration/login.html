@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Login | SolarFlow CRM{% endblock %}
+{% block page_title %}Secure access for your solar operations team.{% endblock %}
+
+{% block content %}
+  <section class="auth-layout">
+    <div class="auth-panel">
+      <p class="section-kicker">Staff Login</p>
+      <h2>Welcome back</h2>
+      <p class="muted-copy">Use your company account to access the lead pipeline, follow-up queue, and customer timeline.</p>
+      <form method="post" class="stack">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="field">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+        </div>
+        <div class="field">
+          <label for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+        </div>
+        <button class="primary-button" type="submit">Sign in</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
