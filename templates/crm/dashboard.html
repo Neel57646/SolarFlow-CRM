@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load crm_tags %}
+
+{% block title %}Dashboard | SolarFlow CRM{% endblock %}
+{% block page_title %}A secure lead-to-installation pipeline for solar teams.{% endblock %}
+
+{% block content %}
+  <main class="layout">
+    <section class="content-column">
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Manager Dashboard</p>
+            <h2>Pipeline health</h2>
+          </div>
+          <form method="get" class="filter-grid">
+            <div class="field compact">
+              <label for="{{ filter_form.stage.id_for_label }}">Stage</label>
+              {{ filter_form.stage }}
+            </div>
+            <div class="field compact">
+              <label for="{{ filter_form.assigned_to.id_for_label }}">Owner</label>
+              {{ filter_form.assigned_to }}
+            </div>
+            <div class="field compact">
+              <label for="{{ filter_form.status.id_for_label }}">Status</label>
+              {{ filter_form.status }}
+            </div>
+            <button class="secondary-button align-end" type="submit">Apply filters</button>
+          </form>
+        </div>
+
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <p class="metric-label">Active leads</p>
+            <p class="metric-value">{{ metrics.active }}</p>
+          </article>
+          <article class="metric-card">
+            <p class="metric-label">Overdue follow-up</p>
+            <p class="metric-value">{{ metrics.overdue }}</p>
+          </article>
+          <article class="metric-card">
+            <p class="metric-label">Stuck over 7 days</p>
+            <p class="metric-value">{{ metrics.stuck }}</p>
+          </article>
+          <article class="metric-card">
+            <p class="metric-label">Installations booked</p>
+            <p class="metric-value">{{ metrics.scheduled }}</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Lead Pipeline</p>
+            <h2>Working board</h2>
+          </div>
+        </div>
+
+        <div class="stage-board">
+          {% for stage_value, stage_label in stages %}
+            <section class="stage-column">
+              <div class="stage-column-header">
+                <h3>{{ stage_label }}</h3>
+                <span class="stage-count">{{ stage_count_map|get_item:stage_value|default:0 }}</span>
+              </div>
+              <div class="lead-list">
+                {% for lead in leads %}
+                  {% if lead.stage == stage_value %}
+                    <a class="lead-card" href="{% url 'lead-detail' lead.pk %}">
+                      <div class="lead-card-top">
+                        <div>
+                          <h4>{{ lead.name }}</h4>
+                          <p>{{ lead.phone }}{% if lead.email %} • {{ lead.email }}{% endif %}</p>
+                        </div>
+                        {% if lead.assigned_to %}
+                          <span class="badge owner">{{ lead.assigned_to.get_full_name|default:lead.assigned_to.username }}</span>
+                        {% endif %}
+                      </div>
+                      <p class="lead-meta">{{ lead.source }} • {{ lead.address|default:"Location not set" }}</p>
+                      <div class="lead-card-bottom">
+                        <span class="badge {% if lead.is_overdue %}danger{% else %}success{% endif %}">
+                          {% if lead.next_follow_up %}Next: {{ lead.next_follow_up }}{% else %}No follow-up set{% endif %}
+                        </span>
+                        <span class="lead-age">{{ lead.days_open }} days open</span>
+                      </div>
+                    </a>
+                  {% endif %}
+                {% empty %}
+                  <p class="muted-copy">No leads yet.</p>
+                {% endfor %}
+              </div>
+            </section>
+          {% endfor %}
+        </div>
+      </section>
+    </section>
+
+    <aside class="sidebar">
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Manual Entry</p>
+            <h2>Add lead</h2>
+          </div>
+        </div>
+        <form method="post" action="{% url 'lead-create' %}" class="stack">
+          {% csrf_token %}
+          {% for field in create_form %}
+            <div class="field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<small class="error-copy">{{ field.errors|join:", " }}</small>{% endif %}
+            </div>
+          {% endfor %}
+          <button class="primary-button" type="submit">Create lead</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">CSV Import</p>
+            <h2>Bulk upload</h2>
+          </div>
+        </div>
+        <form method="post" action="{% url 'lead-import' %}" enctype="multipart/form-data" class="stack">
+          {% csrf_token %}
+          <div class="field">
+            <label for="{{ import_form.csv_file.id_for_label }}">Lead CSV</label>
+            {{ import_form.csv_file }}
+          </div>
+          <button class="secondary-button" type="submit">Import leads</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Team Focus</p>
+            <h2>Follow-up queue</h2>
+          </div>
+        </div>
+        <div class="queue-list">
+          {% for lead in follow_up_queue %}
+            <a class="queue-item" href="{% url 'lead-detail' lead.pk %}">
+              <strong>{{ lead.name }}</strong>
+              <span>{{ lead.stage }}{% if lead.assigned_to %} • {{ lead.assigned_to.get_full_name|default:lead.assigned_to.username }}{% endif %}</span>
+              <p>{% if lead.is_overdue %}Overdue{% else %}Next follow-up{% endif %}: {{ lead.next_follow_up|default:"Not scheduled" }}</p>
+            </a>
+          {% empty %}
+            <p class="muted-copy">No follow-up items yet.</p>
+          {% endfor %}
+        </div>
+      </section>
+    </aside>
+  </main>
+{% endblock %}
