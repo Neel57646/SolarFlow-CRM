@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lead.name }} | SolarFlow CRM{% endblock %}
+{% block page_title %}Customer timeline and secure workflow updates.{% endblock %}
+
+{% block content %}
+  <main class="detail-layout">
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <p class="section-kicker">Lead Detail</p>
+          <h2>{{ lead.name }}</h2>
+        </div>
+        <a class="secondary-button" href="{% url 'dashboard' %}">Back to dashboard</a>
+      </div>
+
+      <div class="detail-grid">
+        <article class="detail-card">
+          <h3>Lead details</h3>
+          <dl class="details-list">
+            <div><dt>Stage</dt><dd>{{ lead.stage }}</dd></div>
+            <div><dt>Owner</dt><dd>{% if lead.assigned_to %}{{ lead.assigned_to.get_full_name|default:lead.assigned_to.username }}{% else %}Unassigned{% endif %}</dd></div>
+            <div><dt>Phone</dt><dd>{{ lead.phone }}</dd></div>
+            <div><dt>Email</dt><dd>{{ lead.email|default:"Not provided" }}</dd></div>
+            <div><dt>Address</dt><dd>{{ lead.address|default:"Not provided" }}</dd></div>
+            <div><dt>Source</dt><dd>{{ lead.source }}</dd></div>
+            <div><dt>Last contacted</dt><dd>{{ lead.last_contacted|default:"Not yet contacted" }}</dd></div>
+            <div><dt>Next follow-up</dt><dd>{{ lead.next_follow_up|default:"Not scheduled" }}</dd></div>
+            <div><dt>Days open</dt><dd>{{ lead.days_open }}</dd></div>
+            <div><dt>Notes</dt><dd>{{ lead.notes|default:"No notes yet" }}</dd></div>
+          </dl>
+        </article>
+
+        <article class="detail-card">
+          <h3>Update workflow</h3>
+          <form method="post" action="{% url 'lead-update' lead.pk %}" class="stack">
+            {% csrf_token %}
+            {% for field in form %}
+              <div class="field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<small class="error-copy">{{ field.errors|join:", " }}</small>{% endif %}
+              </div>
+            {% endfor %}
+            <button class="primary-button" type="submit">Save update</button>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <p class="section-kicker">Timeline</p>
+          <h2>Activity history</h2>
+        </div>
+      </div>
+      <div class="timeline">
+        {% for activity in lead.activities.all %}
+          <article class="timeline-item">
+            <strong>{{ activity.title }}</strong>
+            <span>{{ activity.created_at|date:"j M Y, g:i a" }}</span>
+            <p>{{ activity.body }}</p>
+          </article>
+        {% empty %}
+          <p class="muted-copy">No activity logged yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+{% endblock %}
