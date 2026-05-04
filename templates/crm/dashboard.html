@@ -72,13 +72,13 @@
                       <div class="lead-card-top">
                         <div>
                           <h4>{{ lead.name }}</h4>
-                          <p>{{ lead.phone }}{% if lead.email %} • {{ lead.email }}{% endif %}</p>
+                          <p>{{ lead.phone }}{% if lead.email %} | {{ lead.email }}{% endif %}</p>
                         </div>
                         {% if lead.assigned_to %}
                           <span class="badge owner">{{ lead.assigned_to.get_full_name|default:lead.assigned_to.username }}</span>
                         {% endif %}
                       </div>
-                      <p class="lead-meta">{{ lead.source }} • {{ lead.address|default:"Location not set" }}</p>
+                      <p class="lead-meta">{{ lead.source }} | {{ lead.address|default:"Location not set" }}</p>
                       <div class="lead-card-bottom">
                         <span class="badge {% if lead.is_overdue %}danger{% else %}success{% endif %}">
                           {% if lead.next_follow_up %}Next: {{ lead.next_follow_up }}{% else %}No follow-up set{% endif %}
@@ -146,7 +146,7 @@
           {% for lead in follow_up_queue %}
             <a class="queue-item" href="{% url 'lead-detail' lead.pk %}">
               <strong>{{ lead.name }}</strong>
-              <span>{{ lead.stage }}{% if lead.assigned_to %} • {{ lead.assigned_to.get_full_name|default:lead.assigned_to.username }}{% endif %}</span>
+              <span>{{ lead.stage }}{% if lead.assigned_to %} | {{ lead.assigned_to.get_full_name|default:lead.assigned_to.username }}{% endif %}</span>
               <p>{% if lead.is_overdue %}Overdue{% else %}Next follow-up{% endif %}: {{ lead.next_follow_up|default:"Not scheduled" }}</p>
             </a>
           {% empty %}
