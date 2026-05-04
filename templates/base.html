@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'crm/styles.css' %}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">{{ app_name }}</p>
+        <h1>{% block page_title %}{{ app_tagline }}{% endblock %}</h1>
+      </div>
+      {% if request.user.is_authenticated %}
+        <div class="header-actions">
+          <div class="user-pill">
+            <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+            <span>{% if is_manager %}Manager{% else %}Staff{% endif %}</span>
+          </div>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="secondary-button" type="submit">Log out</button>
+          </form>
+        </div>
+      {% endif %}
+    </header>
+
+    {% if messages %}
+      <section class="message-stack">
+        {% for message in messages %}
+          <article class="message {{ message.tags }}">{{ message }}</article>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
