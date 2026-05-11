@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .env
+.env.local
 .venv/
 .python_packages/
 vendor/
@@ -12,3 +13,5 @@ db.sqlite3-journal
 *.sqlite3-journal
 staticfiles/
 .pytest_cache/
+
+.vercel
