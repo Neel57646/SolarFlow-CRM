@@ -7,6 +7,8 @@ SolarFlow CRM is now a Django-based internal CRM for small solar installation te
 - Python 3.12
 - Django 5.2.1
 - SQLite for local development
+- Supabase Postgres for online deployment
+- Vercel for hosting
 - Django templates + static CSS
 
 ## Features
@@ -43,6 +45,35 @@ $env:PYTHONPATH="C:\Users\recep\OneDrive\Documents\New project\vendor"
 ```
 
 Then open `http://127.0.0.1:8000`.
+
+## Online deployment
+
+SolarFlow CRM can run online as a login-protected Django app on Vercel with Supabase Postgres.
+
+Required Vercel production environment variables:
+
+- `DATABASE_URL`: Supabase transaction pooler Postgres URL
+- `DJANGO_SECRET_KEY`: long random Django secret
+- `DJANGO_DEBUG`: `0`
+- `DJANGO_ALLOWED_HOSTS`: `.vercel.app,localhost,127.0.0.1`
+- `DJANGO_CSRF_TRUSTED_ORIGINS`: `https://*.vercel.app`
+- `PLANNER_ONLY`: `0`
+- `WHITENOISE_USE_FINDERS`: `1`
+
+One-time admin bootstrap variables:
+
+- `ADMIN_USERNAME`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+
+After setting `DATABASE_URL` locally for the Supabase database, run:
+
+```powershell
+python manage.py migrate
+python manage.py bootstrap_admin
+```
+
+Remove `ADMIN_PASSWORD` from hosted environment variables after the first admin account has been created.
 
 ## Demo accounts
 
