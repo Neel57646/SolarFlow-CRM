@@ -22,3 +22,4 @@ if str(VENDOR_DIR) not in sys.path:
     sys.path.insert(0, str(VENDOR_DIR))
 
 application = get_wsgi_application()
+app = application
