@@ -1,0 +1,20 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/index.py"
+    }
+  ],
+  "functions": {
+    "api/index.py": {
+      "excludeFiles": "{.git/**,.venv/**,.python_packages/**,vendor/**,vendor_pkgs/**,wheelhouse/**,db.sqlite3,*.sqlite3,__pycache__/**,**/__pycache__/**,**/*.pyc}"
+    }
+  }
+}
